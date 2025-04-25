@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五年级英语综合测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .score-container {
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .question {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .options {
+            margin: 15px 0 0 20px;
+        }
+        .option {
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            display: none;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .correct {
+            background-color: #e6f7ee;
+            color: #155724;
+            border-left: 4px solid #2ecc71;
+        }
+        .incorrect {
+            background-color: #fdecea;
+            color: #721c24;
+            border-left: 4px solid #e74c3c;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px auto;
+            display: block;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .progress {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>五年级英语综合测试</h1>
+    <div class="subtitle">语法·词汇·文化知识</div>
+    
+    <div class="score-container">
+        得分: <span id="score">0</span> / 50
+    </div>
+    <div class="progress">
+        题目 <span id="current-question">1</span> / 50
+    </div>
+    
+    <div id="quiz-container"></div>
+
+    <button id="next-btn" disabled>下一题</button>
+
+    <script>
+        // ================= 完整的50道题目数据 =================
+        const questions = [
+            // === 现在进行时 (1-15题) ===
+            {
+                q: "1. Look! The boys ______ basketball in the playground.",
+                options: ["play", "plays", "are playing", "is playing"],
+                answer: "are playing",
+                explanation: "✅ <b>解析：</b>Look! 提示现在进行时，主语 boys 是复数，正确结构是 are playing。"
+            },
+            {
+                q: "2. Listen! The birds ______ in the tree.",
+                options: ["sing", "sings", "is singing", "are singing"],
+                answer: "are singing",
+                explanation: "✅ <b>解析：</b>Listen! 提示现在进行时，主语 birds 是复数，正确结构是 are singing。"
+            },
+            {
+                q: "3. Be quiet! The baby ______.",
+                options: ["sleep", "sleeps", "is sleeping", "are sleeping"],
+                answer: "is sleeping",
+                explanation: "✅ <b>解析：</b>Be quiet! 提示现在进行时，主语 baby 是单数，正确结构是 is sleeping。"
+            },
+            {
+                q: "4. Where is Tom? He ______ TV in the living room.",
+                options: ["watch", "watches", "is watching", "are watching"],
+                answer: "is watching",
+                explanation: "✅ <b>解析：</b>描述正在发生的动作，主语 he 是单数，现在进行时结构是 is watching。"
+            },
+            {
+                q: "5. The students ______ an English class now.",
+                options: ["have", "has", "are having", "is having"],
+                answer: "are having",
+                explanation: "✅ <b>解析：</b>now 提示现在进行时，主语 students 是复数，正确结构是 are having。"
+            },
+            {
+                q: "6. My mother ______ dinner in the kitchen.",
+                options: ["cook", "cooks", "is cooking", "are cooking"],
+                answer: "is cooking",
+                explanation: "✅ <b>解析：</b>描述正在进行的动作，主语 mother 是单数，现在进行时结构是 is cooking。"
+            },
+            {
+                q: "7. It's raining now. The children ______ in the classroom.",
+                options: ["play", "plays", "is playing", "are playing"],
+                answer: "are playing",
+                explanation: "✅ <b>解析：</b>now 提示现在进行时，主语 children 是复数，正确结构是 are playing。"
+            },
+            {
+                q: "8. Look at the picture. The girl ______ a book.",
+                options: ["read", "reads", "is reading", "are reading"],
+                answer: "is reading",
+                explanation: "✅ <b>解析：</b>Look 提示现在进行时，主语 girl 是单数，正确结构是 is reading。"
+            },
+            {
+                q: "9. The dogs ______ in the garden.",
+                options: ["run", "runs", "is running", "are running"],
+                answer: "are running",
+                explanation: "✅ <b>解析：</b>描述正在发生的动作，主语 dogs 是复数，现在进行时结构是 are running。"
+            },
+            {
+                q: "10. I ______ my homework right now.",
+                options: ["do", "does", "am doing", "are doing"],
+                answer: "am doing",
+                explanation: "✅ <b>解析：</b>right now 提示现在进行时，主语 I 的 be 动词用 am，结构是 am doing。"
+            },
+            {
+                q: "11. The phone is ringing. Someone ______ for you.",
+                options: ["wait", "waits", "is waiting", "are waiting"],
+                answer: "is waiting",
+                explanation: "✅ <b>解析：</b>描述正在发生的动作，主语 someone 是单数，现在进行时结构是 is waiting。"
+            },
+            {
+                q: "12. The sun ______ brightly today.",
+                options: ["shine", "shines", "is shining", "are shining"],
+                answer: "is shining",
+                explanation: "✅ <b>解析：</b>today 提示现在进行时，主语 sun 是单数，正确结构是 is shining。"
+            },
+            {
+                q: "13. The workers ______ a new building near our school.",
+                options: ["build", "builds", "is building", "are building"],
+                answer: "are building",
+                explanation: "✅ <b>解析：</b>描述正在进行的动作，主语 workers 是复数，现在进行时结构是 are building。"
+            },
+            {
+                q: "14. Hurry up! The bus ______.",
+                options: ["come", "comes", "is coming", "are coming"],
+                answer: "is coming",
+                explanation: "✅ <b>解析：</b>Hurry up! 提示正在发生的动作，主语 bus 是单数，现在进行时结构是 is coming。"
+            },
+            {
+                q: "15. The teacher ______ the students a story now.",
+                options: ["tell", "tells", "is telling", "are telling"],
+                answer: "is telling",
+                explanation: "✅ <b>解析：</b>now 提示现在进行时，主语 teacher 是单数，正确结构是 is telling。"
+            },
+
+            // === 一般现在时 (16-30题) ===
+            {
+                q: "16. My father ______ English at a school.",
+                options: ["teach", "teaches", "teaching", "to teach"],
+                answer: "teaches",
+                explanation: "✅ <b>解析：</b>主语 father 是第三人称单数，动词 teach 要加 -es。"
+            },
+            {
+                q: "17. We ______ to school by bus every day.",
+                options: ["go", "goes", "going", "are going"],
+                answer: "go",
+                explanation: "✅ <b>解析：</b>主语 we 是第一人称复数，一般现在时动词用原形 go。"
+            },
+            {
+                q: "18. The sun ______ in the east.",
+                options: ["rise", "rises", "rose", "rising"],
+                answer: "rises",
+                explanation: "✅ <b>解析：</b>客观事实用一般现在时，主语 sun 是单数，动词 rise 加 -s。"
+            },
+            {
+                q: "19. Jenny usually ______ her teeth before bedtime.",
+                options: ["brush", "brushes", "brushing", "to brush"],
+                answer: "brushes",
+                explanation: "✅ <b>解析：</b>usually 提示一般现在时，主语 Jenny 是单数，动词 brush 加 -es。"
+            },
+            {
+                q: "20. Cats ______ milk.",
+                options: ["like", "likes", "liking", "to like"],
+                answer: "like",
+                explanation: "✅ <b>解析：</b>一般事实陈述，主语 cats 是复数，动词用原形 like。"
+            },
+            {
+                q: "21. My parents ______ in Nanjing.",
+                options: ["live", "lives", "living", "to live"],
+                answer: "live",
+                explanation: "✅ <b>解析：</b>主语 parents 是复数，一般现在时动词用原形 live。"
+            },
+            {
+                q: "22. The Earth ______ around the sun.",
+                options: ["move", "moves", "moving", "to move"],
+                answer: "moves",
+                explanation: "✅ <b>解析：</b>科学事实用一般现在时，主语 Earth 是单数，动词 move 加 -s。"
+            },
+            {
+                q: "23. I ______ my grandparents every weekend.",
+                options: ["visit", "visits", "visiting", "to visit"],
+                answer: "visit",
+                explanation: "✅ <b>解析：</b>主语 I 是第一人称，一般现在时动词用原形 visit。"
+            },
+            {
+                q: "24. Water ______ at 100 degrees Celsius.",
+                options: ["boil", "boils", "boiling", "to boil"],
+                answer: "boils",
+                explanation: "✅ <b>解析：</b>科学事实用一般现在时，主语 water 是不可数名词，动词 boil 加 -s。"
+            },
+            {
+                q: "25. They ______ football after school.",
+                options: ["play", "plays", "playing", "to play"],
+                answer: "play",
+                explanation: "✅ <b>解析：</b>主语 they 是第三人称复数，动词用原形 play。"
+            },
+            {
+                q: "26. My sister ______ very fast.",
+                options: ["run", "runs", "running", "to run"],
+                answer: "runs",
+                explanation: "✅ <b>解析：</b>主语 sister 是单数，一般现在时动词 run 加 -s。"
+            },
+            {
+                q: "27. The shop ______ at 8:30 every morning.",
+                options: ["open", "opens", "opening", "to open"],
+                answer: "opens",
+                explanation: "✅ <b>解析：</b>every morning 提示一般现在时，主语 shop 是单数，动词 open 加 -s。"
+            },
+            {
+                q: "28. These flowers ______ beautiful.",
+                options: ["look", "looks", "looking", "to look"],
+                answer: "look",
+                explanation: "✅ <b>解析：</b>主语 flowers 是复数，系动词用原形 look。"
+            },
+            {
+                q: "29. Mr. Wang ______ us Chinese on Mondays.",
+                options: ["teach", "teaches", "teaching", "to teach"],
+                answer: "teaches",
+                explanation: "✅ <b>解析：</b>on Mondays 提示一般现在时，主语 Mr. Wang 是单数，动词 teach 加 -es。"
+            },
+            {
+                q: "30. The train ______ at 7:15 pm.",
+                options: ["leave", "leaves", "leaving", "to leave"],
+                answer: "leaves",
+                explanation: "✅ <b>解析：</b>时刻表用一般现在时，主语 train 是单数，动词 leave 加 -s。"
+            },
+
+            // === 词汇题 (31-40题) ===
+            {
+                q: "31. Which word means '图书馆' in English?",
+                options: ["Hospital", "Library", "Supermarket", "Museum"],
+                answer: "Library",
+                explanation: "✅ <b>解析：</b>Library = 图书馆，Hospital=医院，Supermarket=超市，Museum=博物馆。"
+            },
+            {
+                q: "32. The opposite of 'happy' is:",
+                options: ["Sad", "Angry", "Tired", "Excited"],
+                answer: "Sad",
+                explanation: "✅ <b>解析：</b>Happy（开心）的反义词是 Sad（难过）。Angry=生气，Tired=疲倦，Excited=兴奋。"
+            },
+            {
+                q: "33. Which word is a kind of fruit?",
+                options: ["Chair", "Apple", "River", "Cloud"],
+                answer: "Apple",
+                explanation: "✅ <b>解析：</b>Apple（苹果）是水果。Chair=椅子，River=河流，Cloud=云。"
+            },
+            {
+                q: "34. 'Teacher' is to 'school' as 'doctor' is to:",
+                options: ["Park", "Hospital", "Shop", "Farm"],
+                answer: "Hospital",
+                explanation: "✅ <b>解析：</b>医生在医院工作，就像老师在学校工作。这是职业与工作场所的对应关系。"
+            },
+            {
+                q: "35. Which word means '美丽的' in English?",
+                options: ["Big", "Beautiful", "Strong", "Clever"],
+                answer: "Beautiful",
+                explanation: "✅ <b>解析：</b>Beautiful = 美丽的。Big=大的，Strong=强壮的，Clever=聪明的。"
+            },
+            {
+                q: "36. Choose the correct spelling:",
+                options: ["Wensday", "Wendsday", "Wednesday", "Wednsday"],
+                answer: "Wednesday",
+                explanation: "✅ <b>解析：</b>星期三的正确拼写是 Wednesday。注意发音与拼写的区别。"
+            },
+            {
+                q: "37. Which is NOT a color?",
+                options: ["Purple", "Orange", "Square", "Yellow"],
+                answer: "Square",
+                explanation: "✅ <b>解析：</b>Square=正方形，是形状不是颜色。Purple=紫色，Orange=橙色/橘子，Yellow=黄色。"
+            },
+            {
+                q: "38. The word 'quickly' describes:",
+                options: ["A thing", "An action", "A place", "A person"],
+                answer: "An action",
+                explanation: "✅ <b>解析：</b>Quickly（快速地）是副词，用于描述动作（action）的方式。"
+            },
+            {
+                q: "39. Which pair are synonyms (同义词)?",
+                options: ["Big-Small", "Happy-Glad", "Hot-Cold", "Up-Down"],
+                answer: "Happy-Glad",
+                explanation: "✅ <b>解析：</b>Happy 和 Glad 都表示'开心'。其他选项都是反义词关系。"
+            },
+            {
+                q: "40. 'Breakfast' is the meal we eat:",
+                options: ["In the morning", "At noon", "In the evening", "At night"],
+                answer: "In the morning",
+                explanation: "✅ <b>解析：</b>Breakfast=早餐，是一天中的第一餐，在早上（morning）吃。"
+            },
+
+            // === 文化知识 (41-50题) ===
+            {
+                q: "41. Which country is famous for kangaroos?",
+                options: ["Canada", "Australia", "Japan", "Brazil"],
+                answer: "Australia",
+                explanation: "✅ <b>解析：</b>澳大利亚（Australia）以袋鼠（kangaroo）闻名，袋鼠是其国家象征之一。"
+            },
+            {
+                q: "42. The capital of China is:",
+                options: ["Shanghai", "Guangzhou", "Beijing", "Hong Kong"],
+                answer: "Beijing",
+                explanation: "✅ <b>解析：</b>中国的首都是北京（Beijing）。上海、广州、香港都是重要城市但不是首都。"
+            },
+            {
+                q: "43. Which festival has dragon boat races?",
+                options: ["Spring Festival", "Dragon Boat Festival", "Mid-Autumn Festival", "Lantern Festival"],
+                answer: "Dragon Boat Festival",
+                explanation: "✅ <b>解析：</b>端午节（Dragon Boat Festival）有赛龙舟和吃粽子的传统习俗。"
+            },
+            {
+                q: "44. The Great Wall is in:",
+                options: ["Japan", "China", "Korea", "Vietnam"],
+                answer: "China",
+                explanation: "✅ <b>解析：</b>长城（The Great Wall）是世界文化遗产，位于中国。"
+            },
+            {
+                q: "45. Which animal is a symbol of China?",
+                options: ["Elephant", "Kangaroo", "Panda", "Lion"],
+                answer: "Panda",
+                explanation: "✅ <b>解析：</b>熊猫（Panda）是中国的国宝和象征动物。"
+            },
+            {
+                q: "46. The traditional Chinese costume is called:",
+                options: ["Kimono", "Hanfu", "Sari", "Kilt"],
+                answer: "Hanfu",
+                explanation: "✅ <b>解析：</b>汉服（Hanfu）是中国传统服装。Kimono=和服（日本），Sari=纱丽（印度），Kilt=苏格兰裙。"
+            },
+            {
+                q: "47. Which month has the Spring Festival in China?",
+                options: ["December", "January or February", "May", "October"],
+                answer: "January or February",
+                explanation: "✅ <b>解析：</b>春节（Spring Festival）在农历正月初一，公历通常在1月或2月。"
+            },
+            {
+                q: "48. The Yangtze River is the ______ longest river in the world.",
+                options: ["First", "Second", "Third", "Fourth"],
+                answer: "Third",
+                explanation: "✅ <b>解析：</b>长江（Yangtze River）是世界第三长河，仅次于尼罗河和亚马逊河。"
+            },
+            {
+                q: "49. Which city is known as the 'Oriental Pearl'?",
+                options: ["Beijing", "Guangzhou", "Shanghai", "Chongqing"],
+                answer: "Shanghai",
+                explanation: "✅ <b>解析：</b>上海被称为'东方明珠'，其标志性建筑有东方明珠电视塔。"
+            },
+            {
+                q: "50. Traditional Chinese writing uses:",
+                options: ["Letters", "Characters", "Numbers", "Symbols"],
+                answer: "Characters",
+                explanation: "✅ <b>解析：</b>中文使用汉字（Characters）书写，与字母文字（Letters）不同。"
+            }
+        ];
+
+        // ================= 初始化逻辑 =================
+        let currentQuestion = 0;
+        let score = 0;
+        const quizContainer = document.getElementById('quiz-container');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreDisplay = document.getElementById('score');
+        const currentQuestionDisplay = document.getElementById('current-question');
+
+        // 加载题目函数
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) return;
+
+            const q = questions[currentQuestion];
+            currentQuestionDisplay.textContent = currentQuestion + 1;
+            
+            quizContainer.innerHTML = `
+                <div class="question">
+                    <p>${q.q}</p>
+                    <div class="options">
+                        ${q.options.map((opt, i) => `
+                            <div class="option">
+                                <input type="radio" 
+                                       name="question" 
+                                       id="opt${i}" 
+                                       value="${opt}">
+                                <label for="opt${i}">${opt}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            `;
+
+            // 绑定选项事件
+            document.querySelectorAll('input[name="question"]').forEach(radio => {
+                radio.addEventListener('change', function(e) {
+                    const feedback = document.getElementById('feedback');
+                    const selectedValue = e.target.value;
+                    
+                    if (selectedValue === q.answer) {
+                        feedback.innerHTML = `<span style="color:#2ecc71;">✓ 正确！</span> ${q.explanation}`;
+                        feedback.className = "feedback correct";
+                        score++;
+                    } else {
+                        feedback.innerHTML = `<span style="color:#e74c3c;">✗ 错误！</span> 正确答案是 <b>${q.answer}</b><br>${q.explanation}`;
+                        feedback.className = "feedback incorrect";
+                    }
+                    feedback.style.display = "block";
+                    scoreDisplay.textContent = score;
+                    nextBtn.disabled = false;
+                });
+            });
+        }
+
+        // 下一题按钮事件
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                nextBtn.disabled = true;
+                loadQuestion();
+            } else {
+                quizContainer.innerHTML = `
+                    <div class="question" style="text-align:center;">
+                        <h2>测试完成</h2>
+                        <p>您的最终得分：${score}/50</p>
+                        <button onclick="window.location.reload()" 
+                                style="margin-top:20px;
+                                       padding:10px 20px;
+                                       background:#3498db;
+                                       color:white;
+                                       border:none;
+                                       border-radius:5px;">
+                            重新测试
+                        </button>
+                    </div>
+                `;
+                nextBtn.style.display = 'none';
+            }
+        });
+
+        // 安全启动
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                if (questions.length !== 50) throw new Error("题目数量配置错误");
+                loadQuestion();
+            } catch (error) {
+                quizContainer.innerHTML = `<div class="feedback incorrect">系统初始化失败：${error.message}</div>`;
+                console.error("初始化错误:", error);
+            }
+        });
+    </script>
+</body>
+</html>
